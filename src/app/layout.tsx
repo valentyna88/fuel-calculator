@@ -7,6 +7,11 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'Fuel Calculator',
   description: 'Simple online fuel consumption calculator',
+  icons: {
+    icon: '/fuel.png',
+    shortcut: '/fuel.png',
+    apple: '/fuel.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
