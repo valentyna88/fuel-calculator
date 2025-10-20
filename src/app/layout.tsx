@@ -6,7 +6,10 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Fuel Calculator',
-  description: 'Simple online fuel consumption calculator',
+  description:
+    'Quickly estimate your fuel costs for any trip. Built with Next.js and Tailwind CSS.',
+  keywords: ['fuel calculator', 'gas cost', 'Next.js app', 'vehicle fuel consumption'],
+  authors: [{ name: 'Valentyna Taranchuk' }],
   icons: {
     icon: '/fuel.png',
     shortcut: '/fuel.png',
