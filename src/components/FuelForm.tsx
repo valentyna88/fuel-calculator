@@ -8,14 +8,14 @@ export default function FuelForm() {
   const [distance, setDistance] = useState('');
   const [consumption, setConsumption] = useState('');
   const [price, setPrice] = useState('');
-  const [cost, setCost] = useState<number | null>(null);
+  const [result, setResult] = useState<{ cost: number; liters: number } | null>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   useEffect(() => {
-    setCost(null);
+    setResult(null);
   }, [distance, consumption, price]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,8 +23,8 @@ export default function FuelForm() {
 
     if (!distance || !consumption || !price) return;
 
-    const result = calculateFuelCost(distance, consumption, price);
-    setCost(result);
+    const res = calculateFuelCost(distance, consumption, price);
+    setResult(res);
   };
 
   return (
@@ -102,12 +102,17 @@ export default function FuelForm() {
             Estimate Cost
           </button>
 
-          {cost !== null && (
+          {result && (
             <div
-              key={cost}
+              key={result.cost}
               className="mt-4 translate-y-2 animate-[fadeIn_0.5s_ease-out_forwards] text-center text-lg font-semibold text-slate-900 opacity-0 transition-all duration-500 ease-out"
             >
-              Estimated Trip Cost: <span className="text-emerald-600">{cost} €</span>
+              <p>
+                Estimated Trip Cost: <span className="text-emerald-600">{result.cost} €</span>
+              </p>
+              <p className="mt-1 text-base text-slate-600">
+                Fuel Needed: <span className="text-indigo-600">{result.liters} L</span>
+              </p>
             </div>
           )}
         </form>
