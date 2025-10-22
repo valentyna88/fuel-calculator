@@ -9,6 +9,11 @@ export default function Home() {
         </h1>
         <FuelForm />
       </div>
+      <footer className="mt-auto pb-4 text-center">
+        <p className="text-xs text-slate-300">
+          © {new Date().getFullYear()} Fuel Calculator by Valentyna Taranchuk
+        </p>
+      </footer>
     </main>
   );
 }
