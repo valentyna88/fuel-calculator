@@ -29,7 +29,7 @@ export default function FuelForm() {
 
   return (
     <div
-      className={`w-full max-w-md rounded-xl bg-gradient-to-br from-slate-50 to-white p-6 shadow-md ring-1 ring-slate-200 transition-all duration-500 ${
+      className={`w-full max-w-md rounded-2xl bg-white/80 p-6 shadow-lg ring-1 ring-slate-300 backdrop-blur-sm ${
         mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`}
     >
