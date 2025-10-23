@@ -93,15 +93,27 @@ export default function FuelForm() {
               autoComplete="off"
             />
           </div>
-
-          <button
-            type="submit"
-            aria-label="Estimate fuel cost"
-            className="w-full rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 hover:scale-[1.02] hover:bg-indigo-600 active:scale-[0.98]"
-          >
-            Estimate Cost
-          </button>
-
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              aria-label="Estimate fuel cost"
+              className="w-full rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 hover:scale-[1.02] hover:bg-indigo-600 active:scale-[0.98]"
+            >
+              Estimate Cost
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDistance('');
+                setConsumption('');
+                setPrice('');
+                setResult(null);
+              }}
+              className="flex-1 rounded-lg border border-indigo-200 bg-white py-2 font-medium text-slate-700 transition hover:bg-slate-50"
+            >
+              Reset
+            </button>
+          </div>
           {result && (
             <div
               key={result.cost}
