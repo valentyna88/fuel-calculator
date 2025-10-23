@@ -27,6 +27,15 @@ export default function FuelForm() {
     setResult(res);
   };
 
+  const handleReset = () => {
+    setDistance('');
+    setConsumption('');
+    setPrice('');
+    setResult(null);
+  };
+
+  const isFormFilled = distance && consumption && price;
+
   return (
     <div
       className={`w-full max-w-md rounded-2xl bg-white/80 p-6 shadow-lg ring-1 ring-slate-300 backdrop-blur-sm ${
@@ -97,23 +106,21 @@ export default function FuelForm() {
             <button
               type="submit"
               aria-label="Estimate fuel cost"
-              className="w-full rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 hover:scale-[1.02] hover:bg-indigo-600 active:scale-[0.98]"
+              className="w-full cursor-pointer rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 hover:scale-[1.01] hover:bg-indigo-600 active:scale-[0.98]"
             >
               Estimate Cost
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setDistance('');
-                setConsumption('');
-                setPrice('');
-                setResult(null);
-              }}
-              className="flex-1 rounded-lg border border-indigo-200 bg-white py-2 font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              Reset
-            </button>
+            {isFormFilled && (
+              <button
+                type="button"
+                onClick={handleReset}
+                className="w-full cursor-pointer rounded-lg border border-indigo-200 bg-indigo-50 py-2 font-semibold text-indigo-600 transition-all duration-200 hover:bg-indigo-100 hover:text-indigo-700 active:scale-[0.98]"
+              >
+                Reset
+              </button>
+            )}
           </div>
+
           {result && (
             <div
               key={result.cost}
