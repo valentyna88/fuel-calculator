@@ -11,15 +11,18 @@ export const metadata: Metadata = {
   keywords: ['fuel calculator', 'gas cost', 'Next.js app', 'vehicle fuel consumption'],
   authors: [{ name: 'Valentyna Taranchuk' }],
   icons: {
-    icon: '/fuel.png',
-    shortcut: '/fuel.png',
-    apple: '/fuel.png',
+    icon: '/icon-192.png',
+    shortcut: '/icon-192.png',
+    apple: '/icon-192.png',
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   );
