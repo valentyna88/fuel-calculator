@@ -3,13 +3,24 @@ export function calculateFuelCost(
   consumption: string,
   price: string,
 ): { cost: number; liters: number } | null {
-  const d = parseFloat(distance.replace(',', '.'));
-  const c = parseFloat(consumption.replace(',', '.'));
-  const p = parseFloat(price.replace(',', '.'));
+  const distanceKm = Number(distance.replace(',', '.'));
+  const consumptionPer100Km = Number(consumption.replace(',', '.'));
+  const pricePerLiter = Number(price.replace(',', '.'));
 
-  if (!isNaN(d) && !isNaN(c) && !isNaN(p)) {
-    const liters = (d / 100) * c;
-    const cost = liters * p;
+  if (
+    Number.isFinite(distanceKm) &&
+    Number.isFinite(consumptionPer100Km) &&
+    Number.isFinite(pricePerLiter) &&
+    distanceKm > 0 &&
+    consumptionPer100Km > 0 &&
+    pricePerLiter > 0
+  ) {
+    const liters = (distanceKm / 100) * consumptionPer100Km;
+    const cost = liters * pricePerLiter;
+
+    if (!Number.isFinite(liters) || !Number.isFinite(cost)) {
+      return null;
+    }
 
     return {
       cost: parseFloat(cost.toFixed(2)),

@@ -9,6 +9,7 @@ export default function FuelForm() {
   const [consumption, setConsumption] = useState('');
   const [price, setPrice] = useState('');
   const [result, setResult] = useState<{ cost: number; liters: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -16,14 +17,21 @@ export default function FuelForm() {
 
   useEffect(() => {
     setResult(null);
+    setError(null);
   }, [distance, consumption, price]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!distance || !consumption || !price) return;
-
     const res = calculateFuelCost(distance, consumption, price);
+
+    if (res === null) {
+      setError('Please enter valid positive numbers.');
+      setResult(null);
+      return;
+    }
+
+    setError(null);
     setResult(res);
   };
 
@@ -120,6 +128,12 @@ export default function FuelForm() {
               </button>
             )}
           </div>
+
+          {error && (
+            <p role="alert" className="text-center text-sm text-red-600">
+              {error}
+            </p>
+          )}
 
           {result && (
             <div
