@@ -1,8 +1,18 @@
+const isValidDecimal = (value: string): boolean => {
+  const trimmedValue = value.trim();
+
+  return /^\d+(?:[.,]\d+)?$/.test(trimmedValue);
+};
+
 export function calculateFuelCost(
   distance: string,
   consumption: string,
   price: string,
 ): { cost: number; liters: number } | null {
+  if (!isValidDecimal(distance) || !isValidDecimal(consumption) || !isValidDecimal(price)) {
+    return null;
+  }
+
   const distanceKm = Number(distance.replace(',', '.'));
   const consumptionPer100Km = Number(consumption.replace(',', '.'));
   const pricePerLiter = Number(price.replace(',', '.'));
