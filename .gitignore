@@ -44,3 +44,6 @@ next-env.d.ts
 # Serwist - generated Service Worker files
 /public/sw.js
 /public/sw.js.map
+
+# VS Code
+.vscode/
