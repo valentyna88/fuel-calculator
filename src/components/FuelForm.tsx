@@ -42,12 +42,16 @@ export default function FuelForm() {
     setRouteDistance(null);
     setRouteError(null);
     setIsRouteLoading(false);
+    setResult(null);
+    setError(null);
   };
 
   const handleRouteSearch = async () => {
     if (routeRequest.current) return;
     setRouteDistance(null);
     setRouteError(null);
+    setResult(null);
+    setError(null);
 
     if (!fromCity || !toCity) {
       setRouteError('Please choose both From and To cities from the suggestions.');
@@ -110,7 +114,14 @@ export default function FuelForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const res = calculateFuelCost(distance, consumption, price);
+    if (mode === 'route' && (routeDistance === null || isRouteLoading)) {
+      setError('Find a route before estimating fuel cost.');
+      setResult(null);
+      return;
+    }
+
+    const calculationDistance = mode === 'route' ? String(routeDistance) : distance;
+    const res = calculateFuelCost(calculationDistance, consumption, price);
 
     if (res === null) {
       setError('Please enter valid positive numbers.');
@@ -130,6 +141,30 @@ export default function FuelForm() {
   };
 
   const isFormFilled = distance && consumption && price;
+
+  const calculationFeedback = (
+    <>
+      {error && (
+        <p role="alert" className="text-center text-sm text-red-600">
+          {error}
+        </p>
+      )}
+
+      {result && (
+        <div
+          key={result.cost}
+          className="mt-4 translate-y-2 animate-[fadeIn_0.5s_ease-out_forwards] text-center text-lg font-semibold text-slate-900 opacity-0 transition-all duration-500 ease-out"
+        >
+          <p>
+            Estimated Trip Cost: <span className="text-emerald-600">{result.cost} €</span>
+          </p>
+          <p className="mt-1 text-base text-slate-600">
+            Fuel Needed: <span className="text-indigo-600">{result.liters} L</span>
+          </p>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div
@@ -170,7 +205,7 @@ export default function FuelForm() {
       </div>
 
       {mode === 'route' ? (
-        <div className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <CityAutocomplete
             id="from"
             label="From"
@@ -233,7 +268,24 @@ export default function FuelForm() {
             onConsumptionChange={setConsumption}
             onPriceChange={setPrice}
           />
-        </div>
+
+          <button
+            type="submit"
+            aria-label="Estimate fuel cost"
+            disabled={routeDistance === null || isRouteLoading}
+            className="w-full cursor-pointer rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 enabled:hover:scale-[1.01] enabled:hover:bg-indigo-600 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Estimate Cost
+          </button>
+
+          {routeDistance === null && !isRouteLoading && (
+            <p className="text-center text-sm text-slate-600">
+              Find a route before estimating fuel cost.
+            </p>
+          )}
+
+          {calculationFeedback}
+        </form>
       ) : !mounted ? (
         <div className="space-y-4" aria-hidden="true">
           <div className="h-10 w-full animate-pulse rounded bg-slate-100" />
@@ -285,25 +337,7 @@ export default function FuelForm() {
             )}
           </div>
 
-          {error && (
-            <p role="alert" className="text-center text-sm text-red-600">
-              {error}
-            </p>
-          )}
-
-          {result && (
-            <div
-              key={result.cost}
-              className="mt-4 translate-y-2 animate-[fadeIn_0.5s_ease-out_forwards] text-center text-lg font-semibold text-slate-900 opacity-0 transition-all duration-500 ease-out"
-            >
-              <p>
-                Estimated Trip Cost: <span className="text-emerald-600">{result.cost} €</span>
-              </p>
-              <p className="mt-1 text-base text-slate-600">
-                Fuel Needed: <span className="text-indigo-600">{result.liters} L</span>
-              </p>
-            </div>
-          )}
+          {calculationFeedback}
         </form>
       )}
     </div>
