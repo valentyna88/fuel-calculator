@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import { calculateFuelCost } from '@/lib/calculateFuelCost';
 import FuelDetailsFields from './FuelDetailsFields';
+import CityAutocomplete from './CityAutocomplete';
+import type { City } from '@/types/city';
 
 export default function FuelForm() {
   const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<'distance' | 'route'>('distance');
   const [from, setFrom] = useState('');
+  const [fromCity, setFromCity] = useState<City | null>(null);
   const [to, setTo] = useState('');
   const [distance, setDistance] = useState('');
   const [consumption, setConsumption] = useState('');
@@ -88,20 +91,17 @@ export default function FuelForm() {
 
       {mode === 'route' ? (
         <div className="space-y-5">
-          <div>
-            <label htmlFor="from" className="mb-1 block text-sm font-medium text-slate-700">
-              From
-            </label>
-            <input
-              id="from"
-              type="text"
-              placeholder="e.g., Tallinn"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
-              autoComplete="off"
-              className="w-full rounded-lg border border-slate-300 p-2 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
-          </div>
+          <CityAutocomplete
+            id="from"
+            label="From"
+            placeholder="e.g., Tallinn"
+            value={from}
+            city={fromCity}
+            onChange={(value, city) => {
+              setFrom(value);
+              setFromCity(city);
+            }}
+          />
 
           <div>
             <label htmlFor="to" className="mb-1 block text-sm font-medium text-slate-700">
