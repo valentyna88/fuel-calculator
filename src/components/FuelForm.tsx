@@ -12,6 +12,7 @@ export default function FuelForm() {
   const [from, setFrom] = useState('');
   const [fromCity, setFromCity] = useState<City | null>(null);
   const [to, setTo] = useState('');
+  const [toCity, setToCity] = useState<City | null>(null);
   const [distance, setDistance] = useState('');
   const [consumption, setConsumption] = useState('');
   const [price, setPrice] = useState('');
@@ -103,20 +104,17 @@ export default function FuelForm() {
             }}
           />
 
-          <div>
-            <label htmlFor="to" className="mb-1 block text-sm font-medium text-slate-700">
-              To
-            </label>
-            <input
-              id="to"
-              type="text"
-              placeholder="e.g., Riga"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              autoComplete="off"
-              className="w-full rounded-lg border border-slate-300 p-2 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            />
-          </div>
+          <CityAutocomplete
+            id="to"
+            label="To"
+            placeholder="e.g., Riga"
+            value={to}
+            city={toCity}
+            onChange={(value, city) => {
+              setTo(value);
+              setToCity(city);
+            }}
+          />
 
           <FuelDetailsFields
             consumption={consumption}
