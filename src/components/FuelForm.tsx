@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { calculateFuelCost } from '@/lib/calculateFuelCost';
 import FuelDetailsFields from './FuelDetailsFields';
 import CityAutocomplete from './CityAutocomplete';
@@ -13,6 +13,10 @@ export default function FuelForm() {
   const [fromCity, setFromCity] = useState<City | null>(null);
   const [to, setTo] = useState('');
   const [toCity, setToCity] = useState<City | null>(null);
+  const [routeDistance, setRouteDistance] = useState<number | null>(null);
+  const [routeError, setRouteError] = useState<string | null>(null);
+  const [isRouteLoading, setIsRouteLoading] = useState(false);
+  const routeRequest = useRef<AbortController | null>(null);
   const [distance, setDistance] = useState('');
   const [consumption, setConsumption] = useState('');
   const [price, setPrice] = useState('');
@@ -27,6 +31,81 @@ export default function FuelForm() {
     setResult(null);
     setError(null);
   }, [distance, consumption, price, mode, from, to]);
+
+  useEffect(() => {
+    return () => routeRequest.current?.abort();
+  }, []);
+
+  const resetRoute = () => {
+    routeRequest.current?.abort();
+    routeRequest.current = null;
+    setRouteDistance(null);
+    setRouteError(null);
+    setIsRouteLoading(false);
+  };
+
+  const handleRouteSearch = async () => {
+    if (routeRequest.current) return;
+    setRouteDistance(null);
+    setRouteError(null);
+
+    if (!fromCity || !toCity) {
+      setRouteError('Please choose both From and To cities from the suggestions.');
+      return;
+    }
+
+    const controller = new AbortController();
+    routeRequest.current = controller;
+    setIsRouteLoading(true);
+
+    const params = new URLSearchParams({
+      fromLat: String(fromCity.latitude),
+      fromLon: String(fromCity.longitude),
+      toLat: String(toCity.latitude),
+      toLon: String(toCity.longitude),
+    });
+
+    try {
+      const response = await fetch(`/api/route-distance?${params}`, {
+        signal: controller.signal,
+        cache: 'no-store',
+      });
+      const data: unknown = await response.json();
+      if (controller.signal.aborted || routeRequest.current !== controller) return;
+
+      if (!response.ok) {
+        setRouteError(
+          data && typeof data === 'object' && 'error' in data && typeof data.error === 'string'
+            ? data.error
+            : 'Route search failed. Please try again.',
+        );
+        return;
+      }
+
+      if (
+        !data ||
+        typeof data !== 'object' ||
+        !('distanceKm' in data) ||
+        typeof data.distanceKm !== 'number' ||
+        !Number.isFinite(data.distanceKm) ||
+        data.distanceKm < 0
+      ) {
+        setRouteError('Route search returned an invalid distance. Please try again.');
+        return;
+      }
+
+      setRouteDistance(data.distanceKm);
+    } catch {
+      if (!controller.signal.aborted && routeRequest.current === controller) {
+        setRouteError('Route search failed. Check your connection and try again.');
+      }
+    } finally {
+      if (routeRequest.current === controller) {
+        routeRequest.current = null;
+        setIsRouteLoading(false);
+      }
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +178,7 @@ export default function FuelForm() {
             value={from}
             city={fromCity}
             onChange={(value, city) => {
+              resetRoute();
               setFrom(value);
               setFromCity(city);
             }}
@@ -111,10 +191,41 @@ export default function FuelForm() {
             value={to}
             city={toCity}
             onChange={(value, city) => {
+              resetRoute();
               setTo(value);
               setToCity(city);
             }}
           />
+
+          <button
+            type="button"
+            onClick={handleRouteSearch}
+            disabled={isRouteLoading}
+            className="w-full cursor-pointer rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-colors hover:bg-indigo-600 disabled:cursor-wait disabled:opacity-60"
+          >
+            {isRouteLoading ? 'Finding Route…' : 'Find Route'}
+          </button>
+
+          {isRouteLoading && (
+            <p role="status" className="text-center text-sm text-slate-600">
+              Finding a driving route…
+            </p>
+          )}
+
+          {routeError && (
+            <p role="alert" className="text-center text-sm text-red-600">
+              {routeError}
+            </p>
+          )}
+
+          {routeDistance !== null && (
+            <p role="status" className="text-center text-lg font-semibold text-slate-900">
+              Driving Distance:{' '}
+              <span className="text-indigo-600">
+                {routeDistance.toLocaleString('en-GB', { maximumFractionDigits: 2 })} km
+              </span>
+            </p>
+          )}
 
           <FuelDetailsFields
             consumption={consumption}
