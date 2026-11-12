@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { calculateFuelCost } from '@/lib/calculateFuelCost';
+import FuelDetailsFields from './FuelDetailsFields';
 
 export default function FuelForm() {
   const [mounted, setMounted] = useState(false);
+  const [mode, setMode] = useState<'distance' | 'route'>('distance');
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
   const [distance, setDistance] = useState('');
   const [consumption, setConsumption] = useState('');
   const [price, setPrice] = useState('');
@@ -18,7 +22,7 @@ export default function FuelForm() {
   useEffect(() => {
     setResult(null);
     setError(null);
-  }, [distance, consumption, price]);
+  }, [distance, consumption, price, mode, from, to]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +58,74 @@ export default function FuelForm() {
         Enter your trip details to calculate fuel expenses
       </p>
 
-      {!mounted ? (
+      <div className="mb-5 flex rounded-lg bg-slate-100 p-1">
+        <button
+          type="button"
+          onClick={() => setMode('distance')}
+          aria-pressed={mode === 'distance'}
+          className={`flex-1 cursor-pointer rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            mode === 'distance'
+              ? 'bg-indigo-500 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          By Distance
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMode('route')}
+          aria-pressed={mode === 'route'}
+          className={`flex-1 cursor-pointer rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+            mode === 'route'
+              ? 'bg-indigo-500 text-white shadow-sm'
+              : 'text-slate-600 hover:bg-slate-200'
+          }`}
+        >
+          By Route
+        </button>
+      </div>
+
+      {mode === 'route' ? (
+        <div className="space-y-5">
+          <div>
+            <label htmlFor="from" className="mb-1 block text-sm font-medium text-slate-700">
+              From
+            </label>
+            <input
+              id="from"
+              type="text"
+              placeholder="e.g., Tallinn"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              autoComplete="off"
+              className="w-full rounded-lg border border-slate-300 p-2 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="to" className="mb-1 block text-sm font-medium text-slate-700">
+              To
+            </label>
+            <input
+              id="to"
+              type="text"
+              placeholder="e.g., Riga"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              autoComplete="off"
+              className="w-full rounded-lg border border-slate-300 p-2 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <FuelDetailsFields
+            consumption={consumption}
+            price={price}
+            onConsumptionChange={setConsumption}
+            onPriceChange={setPrice}
+          />
+        </div>
+      ) : !mounted ? (
         <div className="space-y-4" aria-hidden="true">
           <div className="h-10 w-full animate-pulse rounded bg-slate-100" />
           <div className="h-10 w-full animate-pulse rounded bg-slate-100" />
@@ -79,37 +150,13 @@ export default function FuelForm() {
             />
           </div>
 
-          <div>
-            <label htmlFor="consumption" className="mb-1 block text-sm font-medium text-slate-700">
-              Vehicle Consumption (L/100 km)
-            </label>
-            <input
-              id="consumption"
-              type="text"
-              inputMode="decimal"
-              placeholder="e.g., 7.2"
-              value={consumption}
-              onChange={(e) => setConsumption(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 p-2 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              autoComplete="off"
-            />
-          </div>
+          <FuelDetailsFields
+            consumption={consumption}
+            price={price}
+            onConsumptionChange={setConsumption}
+            onPriceChange={setPrice}
+          />
 
-          <div>
-            <label htmlFor="price" className="mb-1 block text-sm font-medium text-slate-700">
-              Fuel Price (€/L)
-            </label>
-            <input
-              id="price"
-              type="text"
-              inputMode="decimal"
-              placeholder="e.g., 1.89"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 p-2 transition focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              autoComplete="off"
-            />
-          </div>
           <div className="flex gap-3">
             <button
               type="submit"
