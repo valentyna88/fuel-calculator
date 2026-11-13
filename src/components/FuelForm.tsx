@@ -68,6 +68,11 @@ export default function FuelForm() {
       return;
     }
 
+    if (fromCity.id === toCity.id) {
+      setRouteError('Please choose two different cities.');
+      return;
+    }
+
     const controller = new AbortController();
     routeRequest.current = controller;
     setIsRouteLoading(true);
