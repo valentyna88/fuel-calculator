@@ -194,7 +194,7 @@ export default function FuelForm() {
 
   return (
     <div
-      className={`w-full min-w-0 max-w-md rounded-2xl bg-white/80 p-6 shadow-lg ring-1 ring-slate-300 backdrop-blur-sm [overflow-wrap:anywhere] ${
+      className={`w-full max-w-md min-w-0 rounded-2xl bg-white/80 p-6 [overflow-wrap:anywhere] shadow-lg ring-1 ring-slate-300 backdrop-blur-sm ${
         mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`}
     >
@@ -232,33 +232,47 @@ export default function FuelForm() {
 
       {mode === 'route' ? (
         <form onSubmit={handleSubmit} className="space-y-5">
-          <CityAutocomplete
-            key={`from-${routeResetKey}`}
-            id="from"
-            label="From"
-            placeholder="e.g., Tallinn"
-            value={from}
-            city={fromCity}
-            onChange={(value, city) => {
-              resetRoute();
-              setFrom(value);
-              setFromCity(city);
-            }}
-          />
+          <div className="space-y-2">
+            <div className="space-y-4">
+              <CityAutocomplete
+                key={`from-${routeResetKey}`}
+                id="from"
+                label="From"
+                placeholder="e.g., Tallinn"
+                value={from}
+                city={fromCity}
+                onChange={(value, city) => {
+                  resetRoute();
+                  setFrom(value);
+                  setFromCity(city);
+                }}
+              />
 
-          <CityAutocomplete
-            key={`to-${routeResetKey}`}
-            id="to"
-            label="To"
-            placeholder="e.g., Riga"
-            value={to}
-            city={toCity}
-            onChange={(value, city) => {
-              resetRoute();
-              setTo(value);
-              setToCity(city);
-            }}
-          />
+              <CityAutocomplete
+                key={`to-${routeResetKey}`}
+                id="to"
+                label="To"
+                placeholder="e.g., Riga"
+                value={to}
+                city={toCity}
+                onChange={(value, city) => {
+                  resetRoute();
+                  setTo(value);
+                  setToCity(city);
+                }}
+              />
+            </div>
+            <p className="text-xs text-slate-500">
+              Powered by{' '}
+              <a href="https://www.geoapify.com/" className="underline">
+                Geoapify
+              </a>
+              {' · '}
+              <a href="https://www.openstreetmap.org/copyright" className="underline">
+                © OpenStreetMap contributors
+              </a>
+            </p>
+          </div>
 
           <button
             type="button"
