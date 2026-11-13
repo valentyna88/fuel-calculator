@@ -23,6 +23,8 @@ export default function CityAutocomplete({
   const [status, setStatus] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
   const sequence = useRef(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const touchInteraction = useRef(false);
   const open = focused && cities.length > 0;
   const hint = focused && !city && value.trim().length < 3 ? 'Type at least 3 characters.' : '';
   const statusMessage = city ? 'City selected.' : status || hint;
@@ -82,6 +84,7 @@ export default function CityAutocomplete({
   function select(selected: City) {
     dismiss();
     onChange(selected.label, selected);
+    if (touchInteraction.current) inputRef.current?.blur();
   }
 
   return (
@@ -91,6 +94,7 @@ export default function CityAutocomplete({
       </label>
       <div className="relative">
         <input
+          ref={inputRef}
           id={id}
           type="text"
           role="combobox"
@@ -105,6 +109,9 @@ export default function CityAutocomplete({
           maxLength={120}
           placeholder={placeholder}
           value={value}
+          onPointerDown={(event) => {
+            touchInteraction.current = event.pointerType === 'touch' || event.pointerType === 'pen';
+          }}
           onFocus={() => setFocused(true)}
           onBlur={() => {
             setFocused(false);
@@ -115,7 +122,7 @@ export default function CityAutocomplete({
             onChange(event.target.value, null);
           }}
           onKeyDown={(event) => {
-            if (event.nativeEvent.isComposing) return;
+            if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
             if (event.key === 'Escape') {
               event.preventDefault();
               dismiss();
@@ -151,6 +158,10 @@ export default function CityAutocomplete({
               id={`${id}-option-${index}`}
               role="option"
               aria-selected={index === activeIndex}
+              onPointerDown={(event) => {
+                touchInteraction.current =
+                  event.pointerType === 'touch' || event.pointerType === 'pen';
+              }}
               onMouseDown={(event) => event.preventDefault()}
               onMouseEnter={() => setActiveIndex(index)}
               onClick={() => select(suggestion)}

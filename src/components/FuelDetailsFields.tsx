@@ -1,3 +1,13 @@
+import type { KeyboardEvent } from 'react';
+
+function handleDone(event: KeyboardEvent<HTMLInputElement>) {
+  if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229 || event.key !== 'Enter') {
+    return;
+  }
+  event.preventDefault();
+  event.currentTarget.blur();
+}
+
 type FuelDetailsFieldsProps = {
   consumption: string;
   price: string;
@@ -21,6 +31,8 @@ export default function FuelDetailsFields({
           id="consumption"
           type="text"
           inputMode="decimal"
+          enterKeyHint="done"
+          onKeyDown={handleDone}
           placeholder="e.g., 7.2"
           value={consumption}
           onChange={(e) => onConsumptionChange(e.target.value)}
@@ -37,6 +49,8 @@ export default function FuelDetailsFields({
           id="price"
           type="text"
           inputMode="decimal"
+          enterKeyHint="done"
+          onKeyDown={handleDone}
           placeholder="e.g., 1.89"
           value={price}
           onChange={(e) => onPriceChange(e.target.value)}

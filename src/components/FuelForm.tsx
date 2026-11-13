@@ -18,6 +18,7 @@ export default function FuelForm() {
   const [routeError, setRouteError] = useState<string | null>(null);
   const [isRouteLoading, setIsRouteLoading] = useState(false);
   const routeRequest = useRef<AbortController | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [distance, setDistance] = useState('');
   const [consumption, setConsumption] = useState('');
   const [price, setPrice] = useState('');
@@ -37,6 +38,13 @@ export default function FuelForm() {
     return () => routeRequest.current?.abort();
   }, []);
 
+  const blurActiveInput = () => {
+    const activeInput = document.activeElement;
+    if (activeInput instanceof HTMLInputElement && containerRef.current?.contains(activeInput)) {
+      activeInput.blur();
+    }
+  };
+
   const resetRoute = () => {
     routeRequest.current?.abort();
     routeRequest.current = null;
@@ -48,6 +56,7 @@ export default function FuelForm() {
   };
 
   const handleRouteSearch = async () => {
+    blurActiveInput();
     if (routeRequest.current) return;
     setRouteDistance(null);
     setRouteError(null);
@@ -114,6 +123,7 @@ export default function FuelForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    blurActiveInput();
 
     if (mode === 'route' && (routeDistance === null || isRouteLoading)) {
       setError('Find a route before estimating fuel cost.');
@@ -135,6 +145,7 @@ export default function FuelForm() {
   };
 
   const handleReset = () => {
+    blurActiveInput();
     setDistance('');
     setConsumption('');
     setPrice('');
@@ -142,6 +153,7 @@ export default function FuelForm() {
   };
 
   const handleRouteReset = () => {
+    blurActiveInput();
     resetRoute();
     setFrom('');
     setTo('');
@@ -194,6 +206,7 @@ export default function FuelForm() {
 
   return (
     <div
+      ref={containerRef}
       className={`w-full max-w-md min-w-0 rounded-2xl bg-white/80 p-6 [overflow-wrap:anywhere] shadow-lg ring-1 ring-slate-300 backdrop-blur-sm ${
         mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`}
@@ -356,6 +369,18 @@ export default function FuelForm() {
               id="distance"
               type="text"
               inputMode="decimal"
+              enterKeyHint="done"
+              onKeyDown={(event) => {
+                if (
+                  event.nativeEvent.isComposing ||
+                  event.nativeEvent.keyCode === 229 ||
+                  event.key !== 'Enter'
+                ) {
+                  return;
+                }
+                event.preventDefault();
+                event.currentTarget.blur();
+              }}
               placeholder="e.g., 250"
               value={distance}
               onChange={(e) => setDistance(e.target.value)}
