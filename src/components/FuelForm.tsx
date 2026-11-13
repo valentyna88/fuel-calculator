@@ -194,7 +194,7 @@ export default function FuelForm() {
 
   return (
     <div
-      className={`w-full max-w-md rounded-2xl bg-white/80 p-6 shadow-lg ring-1 ring-slate-300 backdrop-blur-sm ${
+      className={`w-full min-w-0 max-w-md rounded-2xl bg-white/80 p-6 shadow-lg ring-1 ring-slate-300 backdrop-blur-sm [overflow-wrap:anywhere] ${
         mounted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
       }`}
     >
