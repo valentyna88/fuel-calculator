@@ -13,6 +13,7 @@ export default function FuelForm() {
   const [fromCity, setFromCity] = useState<City | null>(null);
   const [to, setTo] = useState('');
   const [toCity, setToCity] = useState<City | null>(null);
+  const [routeResetKey, setRouteResetKey] = useState(0);
   const [routeDistance, setRouteDistance] = useState<number | null>(null);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [isRouteLoading, setIsRouteLoading] = useState(false);
@@ -140,7 +141,32 @@ export default function FuelForm() {
     setResult(null);
   };
 
+  const handleRouteReset = () => {
+    resetRoute();
+    setFrom('');
+    setTo('');
+    setFromCity(null);
+    setToCity(null);
+    setConsumption('');
+    setPrice('');
+    // Remount both autocomplete fields to clear local messages and cancel their searches.
+    setRouteResetKey((key) => key + 1);
+  };
+
   const isFormFilled = distance && consumption && price;
+  const hasRouteData = Boolean(
+    from ||
+      to ||
+      consumption ||
+      price ||
+      fromCity ||
+      toCity ||
+      routeDistance !== null ||
+      result ||
+      routeError ||
+      error ||
+      isRouteLoading,
+  );
 
   const calculationFeedback = (
     <>
@@ -207,6 +233,7 @@ export default function FuelForm() {
       {mode === 'route' ? (
         <form onSubmit={handleSubmit} className="space-y-5">
           <CityAutocomplete
+            key={`from-${routeResetKey}`}
             id="from"
             label="From"
             placeholder="e.g., Tallinn"
@@ -220,6 +247,7 @@ export default function FuelForm() {
           />
 
           <CityAutocomplete
+            key={`to-${routeResetKey}`}
             id="to"
             label="To"
             placeholder="e.g., Riga"
@@ -269,14 +297,25 @@ export default function FuelForm() {
             onPriceChange={setPrice}
           />
 
-          <button
-            type="submit"
-            aria-label="Estimate fuel cost"
-            disabled={routeDistance === null || isRouteLoading}
-            className="w-full cursor-pointer rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 enabled:hover:scale-[1.01] enabled:hover:bg-indigo-600 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            Estimate Cost
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              aria-label="Estimate fuel cost"
+              disabled={routeDistance === null || isRouteLoading}
+              className="w-full cursor-pointer rounded-lg bg-indigo-500 py-2 font-semibold text-white transition-transform duration-200 enabled:hover:scale-[1.01] enabled:hover:bg-indigo-600 enabled:active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Estimate Cost
+            </button>
+            {hasRouteData && (
+              <button
+                type="button"
+                onClick={handleRouteReset}
+                className="w-full cursor-pointer rounded-lg border border-indigo-200 bg-indigo-50 py-2 font-semibold text-indigo-600 transition-all duration-200 hover:bg-indigo-100 hover:text-indigo-700 active:scale-[0.98]"
+              >
+                Reset
+              </button>
+            )}
+          </div>
 
           {routeDistance === null && !isRouteLoading && (
             <p className="text-center text-sm text-slate-600">
